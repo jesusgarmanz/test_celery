@@ -1,4 +1,5 @@
 """Actual App instance implementation."""
+import time
 import inspect
 import os
 import sys
@@ -798,7 +799,10 @@ class Celery:
             with P.connection._reraise_as_library_errors():
                 if not ignore_result:
                     self.backend.on_task_call(P, task_id)
+                start_time = time.time()
+                logger.info(f'Before send_task_message {start_time}')
                 amqp.send_task_message(P, name, message, **options)
+                logger.info(f'After send_task_message {time.time() - start_time}')
         result = (result_cls or self.AsyncResult)(task_id)
         # We avoid using the constructor since a custom result class
         # can be used, in which case the constructor may still use
